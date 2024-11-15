@@ -1,0 +1,10 @@
+services:
+  db:
+    image: postgres
+    container_name: store_keeper_db
+    environment:
+      POSTGRES_USER: store_keeper_name
+      POSTGRES_PASSWORD: store_keeper_password
+      POSTGRES_DB: store_keeper_db
+    ports:
+      - "5432:5432"
