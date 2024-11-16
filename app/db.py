@@ -1,8 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase
 from flask import Flask
-from sqlalchemy import MetaData, String
-from app.config import settings
+from sqlalchemy import MetaData
+from app.core import settings
 
 
 class Base(DeclarativeBase):
