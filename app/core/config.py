@@ -5,6 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+class APIPrefixes(BaseModel):
+    api_v1_prefix: str = "/api/v1"
+    user_auth: str = "/user/auth"
+
+
 class DatabaseConfig(BaseModel):
     url: PostgresDsn
     echo: bool = False
@@ -31,6 +36,7 @@ class Settings(BaseSettings):
     testing: bool = False
     db: DatabaseConfig
     jwt: JWTConfig = JWTConfig()
+    api_prefix: APIPrefixes = APIPrefixes()
 
 
 class TestingSettings(BaseSettings):
@@ -43,6 +49,7 @@ class TestingSettings(BaseSettings):
     testing: bool = True
     db: DatabaseConfig
     jwt: JWTConfig = JWTConfig()
+    api_prefix: APIPrefixes = APIPrefixes()
 
 
 settings = Settings()

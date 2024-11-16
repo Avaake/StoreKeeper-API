@@ -15,4 +15,7 @@ def create_app() -> Flask:
     db.init_app(app)
     Migrate(app=app, db=db.get_db())
 
+    from app.api import api_bp
+
+    app.register_blueprint(api_bp)
     return app
