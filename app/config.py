@@ -1,5 +1,8 @@
 from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DatabaseConfig(BaseModel):
@@ -15,7 +18,7 @@ class DatabaseConfig(BaseModel):
 
 
 class JWTConfig(BaseModel):
-    secret_key: str = "supersecretkey"
+    secret_key: str = "super_secret_key"
 
 
 class Settings(BaseSettings):
@@ -27,6 +30,7 @@ class Settings(BaseSettings):
     )
     testing: bool = False
     db: DatabaseConfig
+    jwt: JWTConfig = JWTConfig()
 
 
 class TestingSettings(BaseSettings):
