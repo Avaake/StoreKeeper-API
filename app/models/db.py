@@ -1,6 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
-from flask import Flask
 from sqlalchemy import MetaData
 from app.core import settings
 
@@ -18,8 +17,5 @@ class Database:
     def get_db(self) -> SQLAlchemy:
         return self.__db
 
-    def init_app(self, app: Flask):
-        self.__db.init_app(app)
 
-
-db = Database(Base)
+database = Database(Base)

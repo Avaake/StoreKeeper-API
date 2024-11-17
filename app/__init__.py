@@ -9,11 +9,11 @@ def create_app() -> Flask:
     app.config["TESTING"] = settings.testing
     app.config["JWT_SECRET_KEY"] = settings.jwt.secret_key
 
-    from app.db import db
+    from app.models import db
     from flask_migrate import Migrate
 
     db.init_app(app)
-    Migrate(app=app, db=db.get_db())
+    Migrate(app=app, db=db)
 
     from app.api import api_bp
 
