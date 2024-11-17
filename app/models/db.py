@@ -1,13 +1,19 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy import MetaData
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+from sqlalchemy import MetaData, VARCHAR, func
 from app.core import settings
+from datetime import datetime
 
 
 class Base(DeclarativeBase):
+    id: Mapped[int] = mapped_column(primary_key=True)
     metadata = MetaData(
         naming_convention=settings.db.naming_convention,
     )
+
+    @declared_attr.directive
+    def __tablename__(cls) -> str:
+        return f"{cls.__name__.lower()}s"
 
 
 class Database:
@@ -19,3 +25,13 @@ class Database:
 
 
 database = Database(Base)
+
+
+class User(database.get_db().Model):
+    username: Mapped[str] = mapped_column(VARCHAR(30), nullable=False)
+    email: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
+    password_hash: Mapped[bytes]
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), default=datetime.utcnow
+    )
+    role: Mapped[str] = mapped_column(VARCHAR(5), default="user", server_default="user")
