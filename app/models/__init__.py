@@ -1,9 +1,6 @@
-__all__ = [
-    "db",
-    "Base",
-]
+__all__ = ["db", "Base", "User"]
 
 
-from .db import database, Base
+from .db import database, Base, User
 
 db = database.get_db()

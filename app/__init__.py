@@ -11,11 +11,14 @@ def create_app() -> Flask:
 
     from app.models import db
     from flask_migrate import Migrate
+    from flask_jwt_extended import JWTManager
 
     db.init_app(app)
     Migrate(app=app, db=db)
+    JWTManager(app=app)
 
     from app.api import api_bp
 
     app.register_blueprint(api_bp)
+    print(app.url_map)
     return app

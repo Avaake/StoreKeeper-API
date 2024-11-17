@@ -10,9 +10,10 @@ class Logger:
     def _configure_logger(self):
         logger.remove()
 
-        logger.add(self.log_file, level="DEBUG", rotation="100 MB", compression="zip")
+        # logger.add(self.log_file, level="INFO", rotation="100 MB", compression="zip", retention="7 days")
+        logger.add(self.log_file, level="INFO", mode="w")
 
-        logger.add(sys.stderr, level="INFO", colorize=True)
+        logger.add(sys.stderr, level="ERROR", colorize=True)
 
     def get_logger(self):
         return logger
