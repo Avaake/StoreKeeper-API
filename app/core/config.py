@@ -1,5 +1,5 @@
-from pydantic import BaseModel, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseModel, PostgresDsn
 from dotenv import load_dotenv
 
 load_dotenv()

@@ -1,11 +1,11 @@
-from flask import Blueprint, jsonify, request, Response
-from flask_jwt_extended import create_access_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.core import settings
-from pydantic import ValidationError
-from app.api.schemas import CreateUser
+from flask_jwt_extended import create_access_token
+from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
+from app.api.schemas import CreateUser
+from pydantic import ValidationError
 from app.models import db, User
+from app.core import settings
 from app.core import logger
 
 bp = Blueprint("users", __name__, url_prefix=settings.api_prefix.user_auth)

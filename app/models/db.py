@@ -1,6 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy import MetaData, VARCHAR, func
+from flask_sqlalchemy import SQLAlchemy
 from app.core import settings
 from datetime import datetime
 
