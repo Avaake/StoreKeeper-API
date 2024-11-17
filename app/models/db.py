@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
         naming_convention=settings.db.naming_convention,
     )
 
-    @declared_attr.directive
+    @declared_attr
     def __tablename__(cls) -> str:
         return f"{cls.__name__.lower()}s"
 
