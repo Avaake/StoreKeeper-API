@@ -16,9 +16,9 @@ def register():
     try:
         logger.info("Start registration process")
         data = CreateUser(**request.json)
-        logger.info(f"User data validated: {data.dict()}")
+        logger.info(f"User data validated: {data.model_dump()}")
     except ValidationError as err:
-        logger.info(f"Validation info: {err.errors()}")
+        logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify(err.errors()), 422
 
     try:
@@ -36,7 +36,7 @@ def register():
         return jsonify("A user with this email already exists!"), 400
 
     logger.info(f"Registration successful for {data.email}")
-    return jsonify(data.dict()), 201
+    return jsonify(data.model_dump()), 201
 
 
 @bp.route("/login", methods=["POST"])
@@ -44,10 +44,10 @@ def login():
     try:
         logger.info("Start login process")
         data = CreateUser(**request.json)
-        logger.info(f"User data validated: {data.dict()}")
+        logger.info(f"User data validated: {data.model_dump()}")
     except ValidationError as err:
         logger.info(f"Validation info: {err.errors()}")
-        return jsonify(err.errors()), 422
+        return jsonify({"error": "Validation error", "details": err.errors()}), 422
 
     user = db.session.query(User).filter_by(email=data.email).first()
     if not user:

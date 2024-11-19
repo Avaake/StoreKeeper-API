@@ -8,6 +8,7 @@ load_dotenv()
 class APIPrefixes(BaseModel):
     api_v1_prefix: str = "/api/v1"
     user_auth: str = "/user/auth"
+    categories: str = "/categories"
 
 
 class DatabaseConfig(BaseModel):
@@ -23,7 +24,7 @@ class DatabaseConfig(BaseModel):
 
 
 class JWTConfig(BaseModel):
-    secret_key: str = "super_secret_key"
+    secret_key: str
 
 
 class Settings(BaseSettings):
@@ -35,7 +36,7 @@ class Settings(BaseSettings):
     )
     testing: bool = False
     db: DatabaseConfig
-    jwt: JWTConfig = JWTConfig()
+    jwt: JWTConfig
     api_prefix: APIPrefixes = APIPrefixes()
 
 
@@ -48,7 +49,7 @@ class TestingSettings(BaseSettings):
     )
     testing: bool = True
     db: DatabaseConfig
-    jwt: JWTConfig = JWTConfig()
+    jwt: JWTConfig
     api_prefix: APIPrefixes = APIPrefixes()
 
 
