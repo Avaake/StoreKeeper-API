@@ -70,6 +70,7 @@ class Product(database.get_db().Model):
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
     )
+    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
 
     category: Mapped["Category"] = relationship(back_populates="products")
 
