@@ -5,7 +5,7 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from sqlalchemy import MetaData, VARCHAR, func, Text
+from sqlalchemy import MetaData, VARCHAR, func, Text, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
 from app.core import settings
 from datetime import datetime

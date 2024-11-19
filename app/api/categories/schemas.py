@@ -3,12 +3,6 @@ from typing import Annotated, Optional, List
 from annotated_types import MaxLen, MinLen
 
 
-class CreateUser(BaseModel):
-    username: Optional[Annotated[str, MinLen(4), MaxLen(30)]] = None
-    email: EmailStr
-    password: str
-
-
 class CreateCategorySchema(BaseModel):
     name: str
 

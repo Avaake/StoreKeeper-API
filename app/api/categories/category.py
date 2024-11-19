@@ -1,4 +1,8 @@
-from app.api.schemas import CreateCategorySchema, CategorySchemaRead, CategoryListRead
+from app.api.categories.schemas import (
+    CreateCategorySchema,
+    CategorySchemaRead,
+    CategoryListRead,
+)
 from flask_jwt_extended import current_user, jwt_required
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import IntegrityError
@@ -7,7 +11,7 @@ from pydantic import ValidationError
 from app.models import Category, db
 
 
-bp = Blueprint("categories", __name__, url_prefix=settings.api_prefix.categories)
+bp = Blueprint("category", __name__, url_prefix=settings.api_prefix.category)
 
 
 @bp.route("", methods=["POST"])

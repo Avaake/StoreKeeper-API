@@ -2,20 +2,20 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
-from app.api.schemas import CreateUser
+from app.api.users.schemas import AuthCreateUser
 from pydantic import ValidationError
 from app.models import db, User
 from app.core import settings
 from app.core import logger
 
-bp = Blueprint("users", __name__, url_prefix=settings.api_prefix.user_auth)
+bp = Blueprint("auth", __name__, url_prefix=settings.api_prefix.auth)
 
 
 @bp.route("/registration", methods=["POST"])
 def register():
     try:
         logger.info("Start registration process")
-        data = CreateUser(**request.json)
+        data = AuthCreateUser.model_validate(request.json)
         logger.info(f"User data validated: {data.model_dump()}")
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
@@ -43,7 +43,7 @@ def register():
 def login():
     try:
         logger.info("Start login process")
-        data = CreateUser(**request.json)
+        data = AuthCreateUser.model_validate(request.json)
         logger.info(f"User data validated: {data.model_dump()}")
     except ValidationError as err:
         logger.info(f"Validation info: {err.errors()}")
