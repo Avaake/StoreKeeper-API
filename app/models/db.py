@@ -35,3 +35,13 @@ class User(database.get_db().Model):
         server_default=func.now(), default=datetime.utcnow
     )
     role: Mapped[str] = mapped_column(VARCHAR(5), default="user", server_default="user")
+
+    def __repr__(self):
+        return f"User(id={self.id}, username={self.username}, email={self.email}, password_hash={self.password_hash}, role={self.role})"
+
+
+class Category(database.get_db().Model):
+    name: Mapped[str] = mapped_column(VARCHAR(30), nullable=False)
+
+    def __repr__(self):
+        return f"Category(id={self.id}, name={self.name})"
