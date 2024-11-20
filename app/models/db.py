@@ -40,7 +40,9 @@ class User(database.get_db().Model):
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), default=datetime.utcnow
     )
-    role: Mapped[str] = mapped_column(VARCHAR(5), default="user", server_default="user")
+    role: Mapped[str] = mapped_column(
+        VARCHAR(15), default="user", server_default="user"
+    )
 
     def __repr__(self):
         return (

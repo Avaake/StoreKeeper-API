@@ -19,7 +19,7 @@ def register():
         logger.info(f"User data validated: {data.model_dump()}")
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify(err.errors()), 422
+        return jsonify({"error": "Validation error"}), 422
 
     try:
         user = User(

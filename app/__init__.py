@@ -11,11 +11,11 @@ def create_app() -> Flask:
 
     from app.models import db
     from flask_migrate import Migrate
-    from flask_jwt_extended import JWTManager
+    from app.core.jwt_config import jwt
 
     db.init_app(app)
     Migrate(app=app, db=db)
-    JWTManager(app=app)
+    jwt.init_app(app)
 
     from app.api import api_bp
 
