@@ -20,5 +20,5 @@ def create_app() -> Flask:
     from app.api import api_bp
 
     app.register_blueprint(api_bp)
-    print(app.url_map)
+    # print(app.url_map)
     return app

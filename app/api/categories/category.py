@@ -21,7 +21,7 @@ def create_category():
         data = CreateCategorySchema.model_validate(request.json)
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error", "details": err.errors()}), 400
+        return jsonify({"error": "Validation error"}), 400
 
     try:
         new_category = Category(name=data.name)
@@ -66,7 +66,7 @@ def update_category(category_id: int):
         data = CategorySchemaRead.model_validate(request.json or {})
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error", "details": err.errors()}), 400
+        return jsonify({"error": "Validation error"}), 400
 
     category.name = data.name
     data.id = category.id
