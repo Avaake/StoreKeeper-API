@@ -6,7 +6,7 @@ from app.core import settings
 from app.core import logger
 from flask_jwt_extended import jwt_required, current_user
 
-bp = Blueprint("user", __name__, url_prefix=settings.api_prefix.user)
+bp = Blueprint("user", __name__, url_prefix=settings.api_prefix.users)
 
 
 @bp.route("", methods=["POST"])

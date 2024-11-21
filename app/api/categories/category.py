@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from app.models import Category, db
 
 
-bp = Blueprint("category", __name__, url_prefix=settings.api_prefix.category)
+bp = Blueprint("category", __name__, url_prefix=settings.api_prefix.categories)
 
 
 @bp.route("", methods=["POST"])

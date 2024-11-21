@@ -8,9 +8,10 @@ load_dotenv()
 class APIPrefixes(BaseModel):
     api_v1_prefix: str = "/api/v1"
     auth: str = "/auth"
-    user: str = "/user"
-    category: str = "/category"
-    product: str = "/product"
+    users: str = "/users"
+    categories: str = "/categories"
+    products: str = "/products"
+    orders: str = "/orders"
 
 
 class DatabaseConfig(BaseModel):

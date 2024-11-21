@@ -5,7 +5,7 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from sqlalchemy import MetaData, VARCHAR, func, Text, ForeignKey
+from sqlalchemy import MetaData, VARCHAR, func, Text, ForeignKey, DECIMAL
 from flask_sqlalchemy import SQLAlchemy
 from app.core import settings
 from datetime import datetime
@@ -81,4 +81,36 @@ class Product(database.get_db().Model):
             f"Product(id={self.id}, name={self.name}, description={self.description}, "
             f"price={self.price}, quantity={self.quantity}, created_at={self.created_at}, "
             f"updated_at={self.updated_at})"
+        )
+
+
+class Order(database.get_db().Model):
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    status: Mapped[str] = mapped_column(default="pending", server_default="pending")
+    total_price: Mapped[float] = mapped_column(DECIMAL(10, 2))
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), default=datetime.utcnow
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
+    )
+
+    def __repr__(self):
+        return (
+            f"Order(id={self.id}, user_id={self.user_id}, status={self.status}, "
+            f"total_price={self.total_price}, created_at={self.created_at}, updated_at={self.updated_at})"
+        )
+
+
+class OrderItem(database.get_db().Model):
+    __tablename__ = "order_items"
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    quantity: Mapped[int] = mapped_column()
+    price: Mapped[float] = mapped_column(DECIMAL(10, 2))
+
+    def __repr__(self):
+        return (
+            f"OrderItem(id={self.id}, order_id={self.order_id}, product_id={self.product_id}, "
+            f"quantity={self.quantity}, price={self.price})"
         )

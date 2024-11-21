@@ -11,7 +11,7 @@ from app.models import Product, db, Category
 from sqlalchemy.exc import IntegrityError
 from app.core import logger
 
-bp = Blueprint("product", __name__, url_prefix=settings.api_prefix.product)
+bp = Blueprint("product", __name__, url_prefix=settings.api_prefix.products)
 
 
 @bp.route("", methods=["POST"])
