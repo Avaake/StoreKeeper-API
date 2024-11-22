@@ -75,6 +75,7 @@ class Product(database.get_db().Model):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
 
     category: Mapped["Category"] = relationship(back_populates="products")
+    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="product")
 
     def __repr__(self):
         return (
@@ -95,6 +96,8 @@ class Order(database.get_db().Model):
         server_default=func.now(), onupdate=func.now()
     )
 
+    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="order")
+
     def __repr__(self):
         return (
             f"Order(id={self.id}, user_id={self.user_id}, status={self.status}, "
@@ -108,6 +111,9 @@ class OrderItem(database.get_db().Model):
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
     quantity: Mapped[int] = mapped_column()
     price: Mapped[float] = mapped_column(DECIMAL(10, 2))
+    order: Mapped["Order"] = relationship(back_populates="order_items")
+
+    product: Mapped["Product"] = relationship(back_populates="order_items")
 
     def __repr__(self):
         return (
