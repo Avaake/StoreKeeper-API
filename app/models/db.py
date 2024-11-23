@@ -96,7 +96,9 @@ class Order(database.get_db().Model):
         server_default=func.now(), onupdate=func.now()
     )
 
-    order_items: Mapped[list["OrderItem"]] = relationship(back_populates="order")
+    order_items: Mapped[list["OrderItem"]] = relationship(
+        back_populates="order", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return (
