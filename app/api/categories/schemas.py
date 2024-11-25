@@ -14,10 +14,6 @@ class CategorySchemaRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class CategoryListRead(BaseModel):
-    categories: List[CategorySchemaRead]
-
-
 class CategorySchemaUpdate(BaseModel):
     name: str
 
