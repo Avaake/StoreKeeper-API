@@ -26,12 +26,9 @@ def count_total_price_and(
     try:
         total_price = 0
         for i in products:
-            product = crud.get_product(i.product_id)
-            if product is None:
-                return (
-                    jsonify({"error": f"Product with ID {i.product_id} not found"}),
-                    404,
-                )
+            product = crud.get_product_by_id(i.product_id)
+            if isinstance(product, tuple):
+                return product
             check_quantity = check_quantity_product_in_stock(product, i.quantity)
             if check_quantity is not None:
                 return check_quantity
@@ -56,7 +53,7 @@ def create_order(
         db.session.add(order)
 
         for i in products:
-            product = crud.get_product(i.product_id)
+            product = crud.get_product_by_id(i.product_id)
             order_item = OrderItem(
                 order_id=order.id,
                 product_id=product.id,
@@ -77,12 +74,11 @@ def create_order(
         logger.error(err)
 
 
-def get_orders() -> list[Order] | tuple[Response, int]:
+def get_orders() -> list[Order]:
     try:
         orders = Order.query.all()
         return orders
     except Exception as err:
-        db.session.rollback()
         logger.error(err)
 
 
@@ -95,7 +91,6 @@ def get_order_by_id(order_id: int) -> Order | tuple[Response, int]:
     except IntegrityError as err:
         logger.error(f"Database error: {str(err)}")
     except Exception as err:
-        db.session.rollback()
         logger.error(err)
 
 

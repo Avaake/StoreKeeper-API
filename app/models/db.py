@@ -62,7 +62,7 @@ class Category(database.get_db().Model):
 
 
 class Product(database.get_db().Model):
-    name: Mapped[str] = mapped_column(VARCHAR(255))
+    name: Mapped[str] = mapped_column(VARCHAR(255), unique=True, nullable=False)
     description: Mapped[str] = mapped_column(Text)
     price: Mapped[float] = mapped_column()
     quantity: Mapped[int] = mapped_column()
