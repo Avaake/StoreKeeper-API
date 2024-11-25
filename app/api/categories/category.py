@@ -1,85 +1,121 @@
 from app.api.categories.schemas import (
     CreateCategorySchema,
     CategorySchemaRead,
-    CategoryListRead,
+    CategorySchemaUpdate,
 )
-from flask_jwt_extended import current_user, jwt_required
 from flask import Blueprint, request, jsonify
-from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import jwt_required
 from app.core import settings, logger
 from pydantic import ValidationError
-from app.models import Category, db
+from app.api.categories import crud
 
 
 bp = Blueprint("category", __name__, url_prefix=settings.api_prefix.categories)
 
 
 @bp.route("", methods=["POST"])
-# @jwt_required()
+@jwt_required()
 def create_category():
     try:
-        data = CreateCategorySchema.model_validate(request.json)
+        data = CreateCategorySchema(**request.json)
+        category = crud.create_category(data)
+        if isinstance(category, tuple):
+            return category
+        return (
+            jsonify(
+                {
+                    "message": "Category created successfully",
+                    "category": CategorySchemaRead.model_validate(
+                        category
+                    ).model_dump(),
+                }
+            ),
+            201,
+        )
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify({"error": "Validation error"}), 400
-
-    try:
-        new_category = Category(name=data.name)
-        db.session.add(new_category)
-        db.session.commit()
-        logger.info(f"created {new_category.name} category.")
-    except IntegrityError as err:
-        db.session.rollback()
-        logger.error(f"Integrity error: {err.params}")
-        return jsonify("Така категорія вже існує!"), 400
-
-    return jsonify(data.model_dump()), 201
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("", methods=["GET"])
-# @jwt_required()
+@jwt_required()
 def get_categories():
-    categories = Category.query.all()
-
-    categories_list = CategoryListRead(
-        categories=[
-            CategorySchemaRead.model_validate(category) for category in categories
-        ]
-    )
-    return jsonify(categories_list.model_dump()), 200
+    try:
+        categories = crud.get_categories()
+        return (
+            jsonify(
+                {
+                    "categories": [
+                        CategorySchemaRead(
+                            id=category.id, name=category.name
+                        ).model_dump()
+                        for category in categories
+                    ]
+                }
+            ),
+            200,
+        )
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("/<int:category_id>", methods=["GET"])
-# @jwt_required()
+@jwt_required()
 def get_category(category_id: int):
-    category = Category.query.get_or_404(category_id)
-    category_data = CategorySchemaRead.model_validate(category)
-    return jsonify(category_data.model_dump()), 200
+    try:
+        category = crud.get_category_by_is(category_id)
+        if isinstance(category, tuple):
+            return category
+        return (
+            jsonify(
+                {
+                    "category": CategorySchemaRead.model_validate(
+                        category
+                    ).model_dump(),
+                }
+            ),
+            200,
+        )
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
-@bp.route("/<int:category_id>", methods=["PUT", "PATCH"])
-# @jwt_required()
+@bp.route("/<int:category_id>", methods=["PATCH"])
+@jwt_required()
 def update_category(category_id: int):
-    category = Category.query.get_or_404(category_id)
 
     try:
-        data = CategorySchemaRead.model_validate(request.json or {})
+        data = CategorySchemaUpdate.model_validate(request.json)
+        category = crud.update_category(category_id, data)
+        if isinstance(category, tuple):
+            return category
+        return (
+            jsonify(
+                {"category": CategorySchemaRead.model_validate(category).model_dump()}
+            ),
+            200,
+        )
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify({"error": "Validation error"}), 400
-
-    category.name = data.name
-    data.id = category.id
-    db.session.commit()
-    logger.info(f"updated category {category.name}.")
-    return jsonify(data.model_dump()), 200
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("/<int:category_id>", methods=["DELETE"])
-# @jwt_required()
+@jwt_required()
 def delete_category(category_id: int):
-    category = Category.query.get_or_404(category_id)
-    db.session.delete(category)
-    db.session.commit()
-    logger.info(f"deleted {category.name} category.")
-    return jsonify({"success": True}), 204
+    try:
+        category = crud.delete_order(category_id)
+        if isinstance(category, tuple):
+            return category
+        return jsonify(""), 204
+    except Exception as err:
+        logger.error(err)
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
