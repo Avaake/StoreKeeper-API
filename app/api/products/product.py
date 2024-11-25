@@ -40,6 +40,7 @@ def create_product():
             quantity=data.quantity,
             category_id=data.category_id,
         )
+        print(product)
         db.session.add(product)
         db.session.commit()
     except IntegrityError as err:

@@ -1,5 +1,5 @@
 from flask_jwt_extended import jwt_required, current_user
-from app.api.orders.schemas import OrderCreateSchema
+from app.api.orders.schemas import OrderCreateSchema, OrderUpdateSchema
 from app.api.orders.utils import order_to_dict
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
@@ -31,39 +31,73 @@ def create_order():
             200,
         )
     except ValidationError as err:
+        logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify({"error": "Validation error", "details": err.errors()}), 422
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("", methods=["GET"])
+@jwt_required()
 def get_orders():
-    orders = crud.get_orders()
-
-    return (
-        jsonify({"orders": [order_to_dict(order) for order in orders]}),
-        200,
-    )
+    try:
+        orders = crud.get_orders()
+        if isinstance(orders, tuple):
+            return orders
+        return (
+            jsonify({"orders": [order_to_dict(order) for order in orders]}),
+            200,
+        )
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:order_id>", methods=["GET"])
+@jwt_required()
 def get_order(order_id: int):
-    order = crud.get_order(order_id)
+    try:
+        order = crud.get_order_by_id(order_id)
 
-    if isinstance(order, tuple):
-        return order
-    return (
-        jsonify({"order": order_to_dict(order)}),
-        200,
-    )
+        if isinstance(order, tuple):
+            return order
+        return (
+            jsonify({"order": order_to_dict(order)}),
+            200,
+        )
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:order_id>", methods=["PATCH"])
+@jwt_required()
 def update_order(order_id: int):
-    pass
+    try:
+        data = OrderUpdateSchema(**request.json)
+        order = crud.update_order(order_id, data)
+        if isinstance(order, tuple):
+            return order
+        return (
+            jsonify({"order": order_to_dict(order)}),
+            200,
+        )
+    except ValidationError as err:
+        return jsonify({"error": "Validation error", "details": err.errors()}), 422
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:order_id>", methods=["DELETE"])
+@jwt_required()
 def delete_order(order_id: int):
-    user = crud.delete_order(order_id)
-    if isinstance(user, tuple):
-        return user
-    return jsonify({"success": True}), 204
+    try:
+        user = crud.delete_order(order_id)
+        if isinstance(user, tuple):
+            return user
+        return jsonify({"success": True}), 204
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
