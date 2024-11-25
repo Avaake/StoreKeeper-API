@@ -97,7 +97,7 @@ def delete_order(order_id: int):
         user = crud.delete_order(order_id)
         if isinstance(user, tuple):
             return user
-        return jsonify({"success": True}), 204
+        return jsonify(""), 204
     except Exception as err:
         logger.error({"error": str(err)})
         return jsonify({"error": "Internal Server Error. Try again later"}), 500

@@ -7,9 +7,7 @@ from app.core import logger
 
 
 def check_quantity_product_in_stock(product: Product, required_quantity: int):
-    if (
-        product.quantity < required_quantity
-    ):  # Порівнюємо product.quantity з required_quantity без .quantity
+    if product.quantity < required_quantity:
         return (
             jsonify(
                 {
@@ -42,7 +40,6 @@ def count_total_price_and(
         return total_price
     except Exception as err:
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 def create_order(
@@ -75,10 +72,9 @@ def create_order(
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
     except Exception as err:
+        db.session.rollback()
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 def get_orders() -> list[Order] | tuple[Response, int]:
@@ -86,8 +82,8 @@ def get_orders() -> list[Order] | tuple[Response, int]:
         orders = Order.query.all()
         return orders
     except Exception as err:
+        db.session.rollback()
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 def get_order_by_id(order_id: int) -> Order | tuple[Response, int]:
@@ -98,10 +94,9 @@ def get_order_by_id(order_id: int) -> Order | tuple[Response, int]:
         return order
     except IntegrityError as err:
         logger.error(f"Database error: {str(err)}")
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
     except Exception as err:
+        db.session.rollback()
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 def delete_order(order_id: int) -> tuple[Response, int]:
@@ -114,10 +109,9 @@ def delete_order(order_id: int) -> tuple[Response, int]:
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
-        return jsonify({"error": "Internal Server Error. Try again later"}), 400
     except Exception as err:
+        db.session.rollback()
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 def update_order(order_id: int, data: OrderUpdateSchema):
@@ -165,8 +159,6 @@ def update_order(order_id: int, data: OrderUpdateSchema):
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500
     except Exception as err:
         db.session.rollback()
         logger.error(err)
-        return jsonify({"error": "Internal Server Error. Try again later"}), 500

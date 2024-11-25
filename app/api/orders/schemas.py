@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Annotated, List, Optional
+from typing import List, Optional
 
 
 class OrderItemCrateSchema(BaseModel):
