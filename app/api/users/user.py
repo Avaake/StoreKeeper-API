@@ -29,7 +29,7 @@ def create_user():
         return (
             jsonify(
                 {
-                    "success": True,
+                    "massage": "User created successfully",
                     "user": {
                         "username": user.username,
                         "email": user.email,
@@ -42,40 +42,48 @@ def create_user():
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify({"error": "Validation error", "details": err.errors()}), 422
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("", methods=["GET"])
 @jwt_required()
 def get_users():
-    if current_user.role != "admin":
-        return jsonify({"error": "Only admin can create user"}), 401
-    users = crud.get_users()
-    users_data = [UserRead.model_validate(user).model_dump() for user in users]
-    return jsonify({"users": users_data}), 200
+    try:
+        if current_user.role != "admin":
+            return jsonify({"error": "Only administrators have access"}), 401
+        users = crud.get_users()
+        users_data = [UserRead.model_validate(user).model_dump() for user in users]
+        return jsonify({"users": users_data}), 200
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:user_id>", methods=["GET"])
 @jwt_required()
 def get_user(user_id: int):
+    try:
+        if current_user.role == "admin":
+            user = crud.get_user_by_id(user_id)
+            if isinstance(user, tuple):
+                return user
+            return jsonify({"user": UserRead.model_validate(user).model_dump()}), 200
 
-    if current_user.role == "admin":
-        user = crud.get_user(user_id)
-        if user is None:
-            logger.info(f"User {user_id} not found")
-            return jsonify({"error": "User not found"}), 404
-        return jsonify({"user": UserRead.model_validate(user).model_dump()}), 200
+        if current_user.id == user_id:
+            user = crud.get_user_by_id(user_id)
+            if isinstance(user, tuple):
+                return user
+            return jsonify({"user": UserRead.model_validate(user).model_dump()}), 200
 
-    if current_user.id == user_id:
-        user = crud.get_user(user_id)
-        if user is None:
-            logger.info(f"User {user_id} not found")
-            return jsonify({"error": "User not found"}), 404
-        return jsonify({"user": UserRead.model_validate(user).model_dump()}), 200
-
-    return (
-        jsonify({"message": "Access forbidden: you can only view your own data."}),
-        403,
-    )
+        return (
+            jsonify({"message": "Access forbidden: you can only view your own data."}),
+            403,
+        )
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:user_id>", methods=["PATCH"])
@@ -94,12 +102,19 @@ def update_user(user_id: int):
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
         return jsonify({"error": "Validation error", "details": err.errors()}), 422
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
 @bp.route("<int:user_id>", methods=["DELETE"])
 @jwt_required()
 def delete_user(user_id: int):
-    user = crud.delete_user(user_id)
-    if isinstance(user, tuple):
-        return user
-    return jsonify({"success": True}), 204
+    try:
+        user = crud.delete_user(user_id)
+        if isinstance(user, tuple):
+            return user
+        return jsonify(""), 204
+    except Exception as err:
+        logger.error({"error": str(err)})
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500
