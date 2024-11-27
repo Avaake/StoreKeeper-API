@@ -98,8 +98,12 @@ def register_user(data: AuthCreateUser) -> User | tuple[Response, int]:
         return user
     except IntegrityError as err:
         db.session.rollback()
-        logger.error(f"Database error: {str(err)}")
-        return jsonify("A user with this email already exists!"), 400
+        # Детальне логування помилки
+        logger.error(f"Database IntegrityError: {str(err)}")
+
+        if "uq_users_email" in str(err):
+            return jsonify({"error": "A user with this email already exists!"}), 400
+        return jsonify({"error": "Database error. Please try again later."}), 500
     except Exception as err:
         db.session.rollback()
         logger.error(f"Error: {str(err)}")
@@ -110,7 +114,7 @@ def get_user_by_email(email: str) -> User | tuple[Response, int]:
         user = User.query.filter_by(email=email).first()
         if user is None:
             logger.warning(f"Login attempt with non-existing email: {email}")
-            return jsonify(error="Incorrect email or password!"), 401
+            return jsonify(error="Incorrect email or password!"), 422
         return user
     except Exception as err:
         db.session.rollback()

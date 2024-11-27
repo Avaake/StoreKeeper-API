@@ -1,16 +1,15 @@
-from datetime import timedelta
-
+from app.api.users.schemas import AuthCreateUser, UserRead
 from werkzeug.security import check_password_hash
+from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
 from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     jwt_required,
     get_jwt_identity,
 )
-from flask import Blueprint, jsonify, request
+from datetime import timedelta
 from app.api.users import crud
-from app.api.users.schemas import AuthCreateUser, UserRead
-from pydantic import ValidationError
 from app.core import settings
 from app.core import logger
 
@@ -35,7 +34,7 @@ def register():
         )
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error"}), 422
+        return jsonify({"error": "Validation error", "details": err.errors()}), 422
     except Exception as err:
         logger.error({"error": str(err)})
         return jsonify({"error": "Internal Server Error. Try again later"}), 500
@@ -52,7 +51,7 @@ def login():
             logger.warning(
                 f"Failed login attempt for email: {data.email} (incorrect password)"
             )
-            return jsonify(error="Incorrect email or password!"), 401
+            return jsonify(error="Incorrect email or password!"), 422
 
         access_token = create_access_token(
             identity=user.email, expires_delta=timedelta(minutes=15)
@@ -76,7 +75,7 @@ def refresh():
             identity=current_user_email, expires_delta=timedelta(minutes=15)
         )
 
-        return jsonify(access_token=new_access_token)
+        return jsonify(access_token=new_access_token), 200
     except Exception as err:
         logger.error({"error": str(err)})
         return jsonify({"error": "Internal Server Error. Try again later"}), 500

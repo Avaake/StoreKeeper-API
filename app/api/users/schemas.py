@@ -6,7 +6,7 @@ from annotated_types import MaxLen, MinLen
 class AuthCreateUser(BaseModel):
     username: Optional[Annotated[str, MinLen(4), MaxLen(30)]] = None
     email: EmailStr
-    password: str
+    password: Annotated[str, MinLen(5), MaxLen(30)]
 
 
 class BaseUser(BaseModel):

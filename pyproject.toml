@@ -13,11 +13,11 @@ flask-migrate = "^4.0.7"
 flask-swagger = "^0.2.14"
 flask-swagger-ui = "^4.11.1"
 flask-jwt-extended = "^4.6.0"
-pytest = "^8.3.3"
 pydantic-settings = "^2.6.1"
 psycopg2 = "^2.9.10"
 loguru = "^0.7.2"
 pydantic = {extras = ["email"], version = "^2.9.2"}
+pytest = "^8.3.3"
 
 
 [tool.poetry.group.dev.dependencies]
