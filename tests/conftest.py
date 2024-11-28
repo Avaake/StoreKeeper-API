@@ -59,7 +59,7 @@ def init_db(test_client):
     )
     product3 = Product(
         name="aphone 16",
-        description="aphone 16 description",
+        description="iphone 16 description",
         price=40000,
         quantity=2,
         category_id=1,

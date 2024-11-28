@@ -128,3 +128,52 @@ def test_delete_product(test_client, init_db, sem_token):
         headers={"Authorization": f"Bearer {sem_token[0]}"},
     )
     assert response.status_code == 204
+
+
+def test_full_product(test_client, init_db, sem_token):
+    response = test_client.post(
+        "/api/v1/products",
+        json={
+            "name": "iphone 14 pro",
+            "description": "aphone 14 pro description",
+            "price": 30000,
+            "quantity": 4,
+            "category_id": 1,
+        },
+        headers={"Authorization": f"Bearer {sem_token[0]}"},
+    )
+
+    assert response.status_code == 201
+
+    product_id = response.json["product"]["id"]
+
+    response_get = test_client.get(
+        f"/api/v1/products/{product_id}",
+        headers={"Authorization": f"Bearer {sem_token[0]}"},
+    )
+    assert response_get.status_code == 200
+    assert response_get.json["product"]["id"] == product_id
+
+    response_update = test_client.patch(
+        f"/api/v1/products/{product_id}",
+        json={
+            "name": "samsung 10a",
+            "description": "samsung 10a description",
+            "price": 7000,
+            "quantity": 13,
+            "category_id": 2,
+        },
+        headers={"Authorization": f"Bearer {sem_token[0]}"},
+    )
+    assert response_update.status_code == 200
+    assert response_update.json["product"]["name"] == "samsung 10a"
+    assert response_update.json["product"]["description"] == "samsung 10a description"
+    assert response_update.json["product"]["price"] == 7000
+    assert response_update.json["product"]["quantity"] == 13
+    assert response_update.json["product"]["category_id"] == 2
+
+    response_delete = test_client.delete(
+        f"/api/v1/products/{product_id}",
+        headers={"Authorization": f"Bearer {sem_token[0]}"},
+    )
+    assert response_delete.status_code == 204
