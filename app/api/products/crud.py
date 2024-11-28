@@ -1,10 +1,8 @@
-from app.models import db, Product, Category
+from app.models import db, Product
 from sqlalchemy.exc import IntegrityError
 from flask import jsonify, Response
 from app.api.products.schemas import (
     CreateProductSchema,
-    ProductSchemaRead,
-    ProductListRead,
     UpdateProductSchema,
 )
 from app.core import logger
@@ -46,9 +44,9 @@ def get_products() -> list[Product]:
 
 def get_product_by_id(product_id: int) -> Product | tuple[Response, int]:
     try:
-        product = Product.query.get(product_id)
+        product = Product.query.filter_by(id=product_id).first()
         if product is None:
-            return jsonify({"error": f"Order {product_id} not found"}), 404
+            return jsonify({"error": f"Product not found"}), 404
         return product
     except Exception as err:
         logger.error(err)

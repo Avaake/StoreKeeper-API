@@ -17,10 +17,6 @@ class ProductSchemaRead(CreateProductSchema):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProductListRead(BaseModel):
-    products: List[ProductSchemaRead]
-
-
 class UpdateProductSchema(CreateProductSchema):
     name: Optional[str] = None
     description: Optional[str] = None

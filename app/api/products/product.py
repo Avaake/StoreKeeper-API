@@ -26,14 +26,14 @@ def create_product():
             jsonify(
                 {
                     "message": "Product created successfully",
-                    "category": ProductSchemaRead.model_validate(product).model_dump(),
+                    "product": ProductSchemaRead.model_validate(product).model_dump(),
                 }
             ),
             201,
         )
     except ValidationError as err:
         logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error"}), 400
+        return jsonify({"error": "Validation error"}), 422
     except Exception as err:
         logger.error(err)
         return jsonify({"error": "Internal Server Error. Try again later"}), 500
@@ -89,7 +89,7 @@ def update_product(product_id: int):
 
         return (
             jsonify(
-                {"product": UpdateProductSchema.model_validate(product).model_dump()}
+                {"product": ProductSchemaRead.model_validate(product).model_dump()}
             ),
             200,
         )
