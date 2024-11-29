@@ -35,7 +35,7 @@ def create_user(
 
 def get_user_by_id(user_id: int) -> User | None | tuple[Response, int]:
     try:
-        user = User.query.get(user_id)
+        user = User.query.filter_by(id=user_id).first()
         if user and user.role != "admin":
             return user
         if user is None:

@@ -15,7 +15,15 @@ def create_user():
     try:
         data = CreateUser(**request.json)
         if current_user.role != "admin":
-            return jsonify({"error": "Only admin can create user"}), 401
+            return (
+                jsonify(
+                    {
+                        "error": "Forbidden",
+                        "message": "You do not have permission to perform this action.",
+                    }
+                ),
+                403,
+            )
         user = crud.create_user(
             username=data.username,
             email=data.email,
@@ -31,6 +39,7 @@ def create_user():
                 {
                     "massage": "User created successfully",
                     "user": {
+                        "id": user.id,
                         "username": user.username,
                         "email": user.email,
                         "role": user.role,
@@ -52,7 +61,15 @@ def create_user():
 def get_users():
     try:
         if current_user.role != "admin":
-            return jsonify({"error": "Only administrators have access"}), 401
+            return (
+                jsonify(
+                    {
+                        "error": "Forbidden",
+                        "message": "You do not have permission to perform this action.",
+                    }
+                ),
+                403,
+            )
         users = crud.get_users()
         users_data = [UserRead.model_validate(user).model_dump() for user in users]
         return jsonify({"users": users_data}), 200
@@ -78,7 +95,12 @@ def get_user(user_id: int):
             return jsonify({"user": UserRead.model_validate(user).model_dump()}), 200
 
         return (
-            jsonify({"message": "Access forbidden: you can only view your own data."}),
+            jsonify(
+                {
+                    "error": "Forbidden",
+                    "message": "Access forbidden: you can only view your own data.",
+                }
+            ),
             403,
         )
     except Exception as err:
@@ -93,7 +115,15 @@ def update_user(user_id: int):
 
         data = UserUpdate(**request.json)
         if current_user.role != "admin":
-            return jsonify({"error": "Only admin can update user"}), 401
+            return (
+                jsonify(
+                    {
+                        "error": "Forbidden",
+                        "message": "You do not have permission to perform this action.",
+                    }
+                ),
+                403,
+            )
         user = crud.update_user(user_id, data)
         if isinstance(user, tuple):
             return user
@@ -111,6 +141,16 @@ def update_user(user_id: int):
 @jwt_required()
 def delete_user(user_id: int):
     try:
+        if current_user.role != "admin":
+            return (
+                jsonify(
+                    {
+                        "error": "Forbidden",
+                        "message": "You do not have permission to perform this action.",
+                    }
+                ),
+                403,
+            )
         user = crud.delete_user(user_id)
         if isinstance(user, tuple):
             return user

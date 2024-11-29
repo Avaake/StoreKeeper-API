@@ -10,7 +10,7 @@ class AuthCreateUser(BaseModel):
 
 
 class BaseUser(BaseModel):
-    username: Optional[Annotated[str, MinLen(4), MaxLen(30)]] = None
+    username: Optional[Annotated[str, MinLen(3), MaxLen(30)]] = None
     email: EmailStr
     role: str
 
