@@ -46,7 +46,7 @@ def get_product_by_id(product_id: int) -> Product | tuple[Response, int]:
     try:
         product = Product.query.filter_by(id=product_id).first()
         if product is None:
-            return jsonify({"error": f"Product not found"}), 404
+            return jsonify({"error": "Product not found"}), 404
         return product
     except Exception as err:
         logger.error(err)

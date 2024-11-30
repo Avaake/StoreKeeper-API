@@ -11,7 +11,7 @@ def check_quantity_product_in_stock(product: Product, required_quantity: int):
         return (
             jsonify(
                 {
-                    "error": f"Insufficient quantity of product {product.name} in stock. "
+                    "error": f"Insufficient quantity of product. "
                     f"Available: {product.quantity}, required: {required_quantity}"
                 }
             ),

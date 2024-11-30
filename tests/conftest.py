@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash
-from app.models import db, User, Category, Product
+from app.models import db, User, Category, Product, Order, OrderItem
 from app.core import test_settings
 from app import create_app
 import pytest
@@ -65,6 +65,14 @@ def init_db(test_client):
         category_id=1,
     )
     db.session.add_all([product1, product2, product3])
+    db.session.commit()
+
+    order1 = Order(user_id=2, total_price=188000)
+    order_item1 = OrderItem(order_id=1, product_id=1, quantity=2, price=120000)
+    order_item2 = OrderItem(order_id=1, product_id=3, quantity=1, price=40000)
+    order_item3 = OrderItem(order_id=1, product_id=2, quantity=4, price=28000)
+    db.session.add(order1)
+    db.session.add_all([order_item1, order_item2, order_item3])
     db.session.commit()
 
     yield
