@@ -12,6 +12,7 @@ class APIPrefixes(BaseModel):
     categories: str = "/categories"
     products: str = "/products"
     orders: str = "/orders"
+    reports: str = "/reports"
 
 
 class DatabaseConfig(BaseModel):
