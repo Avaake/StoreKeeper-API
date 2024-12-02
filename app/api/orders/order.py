@@ -1,5 +1,9 @@
 from flask_jwt_extended import jwt_required, current_user
-from app.api.orders.schemas import OrderCreateSchema, OrderUpdateSchema
+from app.api.orders.schemas import (
+    OrderCreateSchema,
+    OrderUpdateSchema,
+    FilterOrderSchema,
+)
 from app.api.orders.utils import order_to_dict
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
@@ -42,13 +46,24 @@ def create_order():
 @jwt_required()
 def get_orders():
     try:
-        orders = crud.get_orders()
+        query_param = FilterOrderSchema(**request.args)
+        orders = (
+            crud.get_orders_by_filter(
+                status=query_param.status.name,
+                start_day=query_param.start_day,
+                end_day=query_param.end_day,
+            )
+            or []
+        )
         if isinstance(orders, tuple):
             return orders
         return (
             jsonify({"orders": [order_to_dict(order) for order in orders]}),
             200,
         )
+    except ValidationError as err:
+        logger.info({"error": "Validation error", "details": err.errors()})
+        return jsonify({"error": "Validation error", "details": err.errors()}), 422
     except Exception as err:
         logger.error({"error": str(err)})
         return jsonify({"error": "Internal Server Error. Try again later"}), 500

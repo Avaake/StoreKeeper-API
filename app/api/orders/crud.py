@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from flask import jsonify, Response
 from app.api.products import crud
 from app.core import logger
+from typing import Union
 
 
 def check_quantity_product_in_stock(product: Product, required_quantity: int):
@@ -74,12 +75,25 @@ def create_order(
         logger.error(err)
 
 
-def get_orders() -> list[Order]:
+def get_orders_by_filter(
+    status: Union[str, None] = None,
+    start_day: Union[str, None] = None,
+    end_day: Union[str, None] = None,
+) -> list[Order]:
     try:
-        orders = Order.query.all()
-        return orders
+        orders = Order.query.order_by(Order.id)
+        if status:
+            orders = orders.filter(Order.status == status)
+
+        if start_day:
+            orders = orders.filter(Order.created_at >= start_day)
+        if end_day:
+            orders = orders.filter(Order.created_at <= end_day)
+
+        return orders.all()
     except Exception as err:
         logger.error(err)
+        return []
 
 
 def get_order_by_id(order_id: int) -> Order | tuple[Response, int]:

@@ -74,3 +74,12 @@ class OrderUpdateSchema(BaseModel):
             }
         },
     )
+
+
+from datetime import datetime
+
+
+class FilterOrderSchema(BaseModel):
+    status: Optional[StatusListSchema] = None
+    start_day: Optional[datetime] = None
+    end_day: Optional[datetime] = None
