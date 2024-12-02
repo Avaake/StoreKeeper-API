@@ -7,6 +7,8 @@ from app.api.products.schemas import (
 )
 from app.core import logger
 from app.api.categories.crud import get_category_by_is
+from typing import Union
+from sqlalchemy import or_
 
 
 def create_product(data: CreateProductSchema):
@@ -34,12 +36,33 @@ def create_product(data: CreateProductSchema):
         logger.error(err)
 
 
-def get_products() -> list[Product]:
+def get_products_by_filter(
+    product_keyword: Union[str, None] = None,
+    category_id: Union[int, None] = None,
+    price_min: Union[str, None] = None,
+    price_max: Union[str, None] = None,
+) -> list[Product]:
     try:
-        products = Product.query.order_by(Product.id).all()
-        return products
+        products = Product.query.order_by(Product.id)
+        if product_keyword:
+            products = products.filter(
+                or_(
+                    Product.name.like(f"%{product_keyword}%"),
+                    Product.description.like(f"%{product_keyword}%"),
+                )
+            )
+        if category_id:
+            products = products.filter(Product.category_id == category_id)
+        if price_min:
+            products = products.filter(Product.price >= price_min)
+
+        if price_max:
+            products = products.filter(Product.price <= price_max)
+
+        return products.all()
     except Exception as err:
         logger.error(err)
+        return []
 
 
 def get_product_by_id(product_id: int) -> Product | tuple[Response, int]:
