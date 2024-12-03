@@ -87,7 +87,10 @@ class Product(database.get_db().Model):
 
 class Order(database.get_db().Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    status: Mapped[str] = mapped_column(default="pending", server_default="pending")
+    status: Mapped[str] = mapped_column(
+        Enum("pending", "completed", "cancelled", name="order_status"),
+        server_default="pending",
+    )
     total_price: Mapped[float] = mapped_column(DECIMAL(10, 2))
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), default=datetime.utcnow
@@ -109,8 +112,10 @@ class Order(database.get_db().Model):
 
 class OrderItem(database.get_db().Model):
     __tablename__ = "order_items"
-    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
+    product_id: Mapped[int] = mapped_column(
+        ForeignKey("products.id", ondelete="SET DEFAULT"), default=0
+    )
     quantity: Mapped[int] = mapped_column()
     price: Mapped[float] = mapped_column(DECIMAL(10, 2))
     order: Mapped["Order"] = relationship(back_populates="order_items")
@@ -136,7 +141,7 @@ class Supplier(database.get_db().Model):
         server_default=func.now(), onupdate=func.now()
     )
 
-    supplies: Mapped[list["Supplier"]] = relationship(back_populates="supplier")
+    supplies: Mapped[list["Supply"]] = relationship(back_populates="supplier")
 
     def __repr__(self):
         return (
@@ -155,7 +160,7 @@ class Supply(database.get_db().Model):
     )
     delivery_date: Mapped[datetime] = mapped_column()
     status: Mapped[str] = mapped_column(
-        Enum("pending", "delivery", "canceled", name="supply_status"),
+        Enum("pending", "delivery", "cancelled", name="supply_status"),
         server_default="pending",
     )
     created_at: Mapped[datetime] = mapped_column(
