@@ -5,7 +5,7 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from sqlalchemy import MetaData, VARCHAR, func, Text, ForeignKey, DECIMAL
+from sqlalchemy import MetaData, VARCHAR, func, Text, ForeignKey, DECIMAL, Enum
 from flask_sqlalchemy import SQLAlchemy
 from app.core import settings
 from datetime import datetime
@@ -121,4 +121,55 @@ class OrderItem(database.get_db().Model):
         return (
             f"OrderItem(id={self.id}, order_id={self.order_id}, product_id={self.product_id}, "
             f"quantity={self.quantity}, price={self.price})"
+        )
+
+
+class Supplier(database.get_db().Model):
+    name: Mapped[str] = mapped_column(VARCHAR(255), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(VARCHAR(50), nullable=True)
+    phone_number: Mapped[str] = mapped_column(VARCHAR(20), nullable=True)
+    address: Mapped[str] = mapped_column(VARCHAR(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), default=datetime.utcnow
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
+    )
+
+    supplies: Mapped[list["Supplier"]] = relationship(back_populates="supplier")
+
+    def __repr__(self):
+        return (
+            f"Supplier(id={self.id}, name={self.name}, email={self.email}, "
+            f"phone_number={self.phone_number}, address={self.address})"
+        )
+
+
+class Supply(database.get_db().Model):
+    __tablename__ = "supplies"
+    product_name: Mapped[str] = mapped_column(VARCHAR(255))
+    quantity: Mapped[int] = mapped_column()
+    price: Mapped[float] = mapped_column(DECIMAL(10, 2))
+    supplier_id: Mapped[int] = mapped_column(
+        ForeignKey("suppliers.id", ondelete="SET NULL"), nullable=True
+    )
+    delivery_date: Mapped[datetime] = mapped_column()
+    status: Mapped[str] = mapped_column(
+        Enum("pending", "delivery", "canceled", name="supply_status"),
+        server_default="pending",
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), default=datetime.utcnow
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
+    )
+
+    supplier: Mapped["Supplier"] = relationship(back_populates="supplies")
+
+    def __repr__(self):
+        return (
+            f"Supply(id={self.id}, product_name={self.product_name}, quantity={self.quantity}, price={self.price}, "
+            f"supplier_id={self.supplier_id}, delivery_date={self.delivery_date}, "
+            f"created_at={self.created_at}, updated_at={self.updated_at})"
         )
