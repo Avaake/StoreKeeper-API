@@ -8,7 +8,7 @@ from app.api.products.schemas import (
 from app.core import logger
 from app.api.categories.crud import get_category_by_is
 from typing import Union
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 
 def create_product(data: CreateProductSchema):
@@ -44,18 +44,19 @@ def get_products_by_filter(
 ) -> list[Product]:
     try:
         products = Product.query.order_by(Product.id)
+        # search
         if product_keyword:
             products = products.filter(
                 or_(
-                    Product.name.like(f"%{product_keyword}%"),
-                    Product.description.like(f"%{product_keyword}%"),
+                    func.lower(Product.name).like(f"%{product_keyword}%"),
+                    func.lower(Product.description).like(f"%{product_keyword}%"),
                 )
             )
+        # filter
         if category_id:
             products = products.filter(Product.category_id == category_id)
         if price_min:
             products = products.filter(Product.price >= price_min)
-
         if price_max:
             products = products.filter(Product.price <= price_max)
 

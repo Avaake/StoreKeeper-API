@@ -130,8 +130,9 @@ def delete_product(product_id: int):
 def search_product():
     try:
         query_params = SearchProductSchema(**request.args)  # request.args.get("q")
-        product_keyword = query_params.q
-        products = crud.get_products_by_filter(product_keyword=product_keyword) or []
+        products = (
+            crud.get_products_by_filter(product_keyword=query_params.q.lower()) or []
+        )
         return (
             jsonify(
                 {
