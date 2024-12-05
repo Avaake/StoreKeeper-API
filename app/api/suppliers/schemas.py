@@ -7,8 +7,8 @@ from typing import Optional, Annotated
 class BaseSupplierSchema(BaseModel):
     name: Annotated[str, Field(min_length=5, max_length=255)]
     email: Optional[EmailStr] = None
-    phone_number: Optional[str] = Field(None, min_length=9, max_length=13)
-    address: Optional[str] = Field(None, min_length=5, max_length=255)
+    phone_number: Optional[Annotated[str, Field(min_length=9, max_length=13)]] = None
+    address: Optional[Annotated[str, Field(min_length=5, max_length=255)]] = None
 
     @field_validator("phone_number")
     def validate_phone_number(cls, value):

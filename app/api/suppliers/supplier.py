@@ -1,8 +1,7 @@
 from flask import Blueprint, jsonify, request
 from pydantic import ValidationError
 from app.api.suppliers import crud
-from app.core import settings
-from app.core import logger
+from app.core import settings, logger
 from app.api.suppliers.schemas import (
     CreateSupplierSchema,
     ReadSupplierSchema,
@@ -43,6 +42,8 @@ def create_supplier():
 def get_suppliers():
     try:
         suppliers = crud.get_suppliers()
+        if isinstance(suppliers, tuple):
+            return suppliers
         return jsonify(
             {
                 "suppliers": [
@@ -60,7 +61,9 @@ def get_suppliers():
 def search_supplier_with_name():
     try:
         qwery_params = SearchSupplierSchema(**request.args)
-        suppliers = crud.get_suppliers(supplier_name=qwery_params.q.lower()) or []
+        suppliers = crud.get_suppliers(supplier_name=qwery_params.q.lower())
+        if isinstance(suppliers, tuple):
+            return suppliers
         return jsonify(
             {
                 "suppliers": [
