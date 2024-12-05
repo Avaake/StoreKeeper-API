@@ -6,9 +6,9 @@ from app.api.orders.schemas import (
 )
 from app.api.orders.utils import order_to_dict
 from flask import Blueprint, request, jsonify
+from app.core import settings, logger
 from pydantic import ValidationError
 from app.api.orders import crud
-from app.core import settings, logger
 
 
 bp = Blueprint("orders", __name__, url_prefix=settings.api_prefix.orders)
@@ -46,13 +46,10 @@ def create_order():
 def get_orders():
     try:
         query_param = FilterOrderSchema(**request.args)
-        orders = (
-            crud.get_orders_by_filter(
-                status=query_param.status.name,
-                start_day=query_param.start_day,
-                end_day=query_param.end_day,
-            )
-            or []
+        orders = crud.get_orders_by_filter(
+            status=query_param.status.name,
+            start_day=query_param.start_day,
+            end_day=query_param.end_day,
         )
         if isinstance(orders, tuple):
             return orders

@@ -1,6 +1,7 @@
 from app.api.orders.schemas import OrderItemCrateSchema, OrderUpdateSchema
 from app.models import db, Order, OrderItem, Product
 from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import NotFound
 from flask import jsonify, Response
 from app.api.products import crud
 from app.core import logger
@@ -37,7 +38,8 @@ def count_total_price_and(
 
         return total_price
     except Exception as err:
-        logger.error(err)
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500
 
 
 def create_order(
@@ -70,16 +72,25 @@ def create_order(
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
+        return (
+            jsonify(
+                {
+                    "error": "There was an issue processing your request. Please try again later."
+                }
+            ),
+            422,
+        )
     except Exception as err:
         db.session.rollback()
-        logger.error(err)
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500
 
 
 def get_orders_by_filter(
     status: Union[str, None] = None,
     start_day: Union[str, None] = None,
     end_day: Union[str, None] = None,
-) -> list[Order]:
+) -> list[Order] | tuple[Response, int]:
     try:
         orders = Order.query.order_by(Order.id)
         if status:
@@ -92,20 +103,24 @@ def get_orders_by_filter(
 
         return orders.all()
     except Exception as err:
-        logger.error(err)
-        return []
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500
 
 
 def get_order_by_id(order_id: int) -> Order | tuple[Response, int]:
     try:
         order = Order.query.filter(Order.id == order_id).first()
         if order is None:
-            return jsonify({"error": f"Order {order_id} not found"}), 404
+            raise NotFound(f"Order {order_id} not found")
         return order
     except IntegrityError as err:
         logger.error(f"Database error: {str(err)}")
+    except NotFound as not_found_err:
+        logger.info(f"NotFound error: {not_found_err}")
+        return jsonify({"error": str(not_found_err)}), 404
     except Exception as err:
-        logger.error(err)
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500
 
 
 def delete_order(order_id: int) -> tuple[Response, int]:
@@ -118,9 +133,17 @@ def delete_order(order_id: int) -> tuple[Response, int]:
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
+        return (
+            jsonify(
+                {
+                    "error": "There was an issue processing your request. Please try again later."
+                }
+            ),
+            422,
+        )
     except Exception as err:
-        db.session.rollback()
-        logger.error(err)
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500
 
 
 def update_order(order_id: int, data: OrderUpdateSchema):
@@ -168,6 +191,14 @@ def update_order(order_id: int, data: OrderUpdateSchema):
     except IntegrityError as err:
         db.session.rollback()
         logger.error(f"Database error: {str(err)}")
+        return (
+            jsonify(
+                {
+                    "error": "There was an issue processing your request. Please try again later."
+                }
+            ),
+            422,
+        )
     except Exception as err:
-        db.session.rollback()
-        logger.error(err)
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later."}), 500

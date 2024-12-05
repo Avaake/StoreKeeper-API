@@ -7,10 +7,9 @@ from app.api.products.schemas import (
 )
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
+from app.core import settings, logger
 from pydantic import ValidationError
 from app.api.products import crud
-from app.core import settings
-from app.core import logger
 
 bp = Blueprint("product", __name__, url_prefix=settings.api_prefix.products)
 
@@ -51,6 +50,8 @@ def get_products():
             price_min=query_params.price_min,
             price_max=query_params.price_max,
         )
+        if isinstance(products, tuple):
+            return products
         return (
             jsonify(
                 {
@@ -133,6 +134,8 @@ def search_product():
         products = (
             crud.get_products_by_filter(product_keyword=query_params.q.lower()) or []
         )
+        if isinstance(products, tuple):
+            return products
         return (
             jsonify(
                 {

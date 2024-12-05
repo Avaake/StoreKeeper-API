@@ -33,8 +33,8 @@ def create_category():
             201,
         )
     except ValidationError as err:
-        logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error"}), 400
+        logger.info(f"Validation Error: {err.errors()}")
+        return jsonify({"error": "validation error", "details": err.errors()}), 422
     except Exception as err:
         logger.error(err)
         return jsonify({"error": "Internal Server Error. Try again later"}), 500
@@ -45,6 +45,8 @@ def create_category():
 def get_categories():
     try:
         categories = crud.get_categories()
+        if isinstance(categories, tuple):
+            return categories
         return (
             jsonify(
                 {
@@ -101,8 +103,8 @@ def update_category(category_id: int):
             200,
         )
     except ValidationError as err:
-        logger.info({"error": "Validation error", "details": err.errors()})
-        return jsonify({"error": "Validation error"}), 400
+        logger.info(f"Validation Error: {err.errors()}")
+        return jsonify({"error": "validation error", "details": err.errors()}), 422
     except Exception as err:
         logger.error(err)
         return jsonify({"error": "Internal Server Error. Try again later"}), 500
