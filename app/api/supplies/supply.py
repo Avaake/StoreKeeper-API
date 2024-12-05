@@ -4,6 +4,7 @@ from app.api.supplies.schemas import (
     UpdateSupplySchema,
 )
 from flask import jsonify, request, Blueprint
+from flask_jwt_extended import jwt_required
 from app.core import settings, logger
 from pydantic import ValidationError
 from app.api.supplies import crud
@@ -12,6 +13,7 @@ bp = Blueprint("supplies", __name__, url_prefix=settings.api_prefix.supplies)
 
 
 @bp.route("", methods=["POST"])
+@jwt_required()
 def create_supplies():
     try:
         data = CreateSupplySchema(**request.json)
@@ -38,6 +40,7 @@ def create_supplies():
 
 
 @bp.route("", methods=["GET"])
+@jwt_required()
 def get_supplies():
     try:
         supplies = crud.get_supplies()
@@ -61,6 +64,7 @@ def get_supplies():
 
 
 @bp.route("<int:supply_id>", methods=["GET"])
+@jwt_required()
 def get_supply(supply_id: int):
     try:
         supply = crud.get_supply_by_id(supply_id=supply_id)
@@ -81,6 +85,7 @@ def get_supply(supply_id: int):
 
 
 @bp.route("<int:supply_id>", methods=["PATCH"])
+@jwt_required()
 def update_supply(supply_id: int):
     try:
         data = UpdateSupplySchema(**request.json)
@@ -104,6 +109,7 @@ def update_supply(supply_id: int):
 
 
 @bp.route("<int:supply_id>", methods=["DELETE"])
+@jwt_required()
 def delete_supply(supply_id: int):
     try:
         supply = crud.delete_supply(supply_id=supply_id)

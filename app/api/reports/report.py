@@ -1,9 +1,8 @@
-from flask_jwt_extended import jwt_required
-from flask import Blueprint, request, jsonify
-from app.api.reports import utils
-from app.core import settings
-from app.core import logger
 from app.api.products.schemas import ProductSchemaRead
+from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required
+from app.core import settings, logger
+from app.api.reports import utils
 
 bp = Blueprint("reports", __name__, url_prefix=settings.api_prefix.reports)
 

@@ -1,18 +1,20 @@
 from flask import Blueprint, jsonify, request
-from pydantic import ValidationError
-from app.api.suppliers import crud
-from app.core import settings, logger
+from flask_jwt_extended import jwt_required
 from app.api.suppliers.schemas import (
     CreateSupplierSchema,
     ReadSupplierSchema,
     SearchSupplierSchema,
     UpdateSupplierSchema,
 )
+from app.core import settings, logger
+from pydantic import ValidationError
+from app.api.suppliers import crud
 
 bp = Blueprint("suppliers", __name__, url_prefix=settings.api_prefix.suppliers)
 
 
 @bp.route("", methods=["POST"])
+@jwt_required()
 def create_supplier():
     try:
         data = CreateSupplierSchema(**request.json)
@@ -39,6 +41,7 @@ def create_supplier():
 
 
 @bp.route("", methods=["GET"])
+@jwt_required()
 def get_suppliers():
     try:
         suppliers = crud.get_suppliers()
@@ -58,6 +61,7 @@ def get_suppliers():
 
 
 @bp.route("/search", methods=["GET"])
+@jwt_required()
 def search_supplier_with_name():
     try:
         qwery_params = SearchSupplierSchema(**request.args)
@@ -81,6 +85,7 @@ def search_supplier_with_name():
 
 
 @bp.route("<int:supplier_id>", methods=["GET"])
+@jwt_required()
 def get_supplier(supplier_id: int):
     try:
         supplier = crud.get_supplier_by_id(supplier_id=supplier_id) or []
@@ -98,6 +103,7 @@ def get_supplier(supplier_id: int):
 
 
 @bp.route("<int:supplier_id>", methods=["PATCH"])
+@jwt_required()
 def update_supplier(supplier_id: int):
     try:
         data = UpdateSupplierSchema(**request.json)
@@ -119,6 +125,7 @@ def update_supplier(supplier_id: int):
 
 
 @bp.route("<int:supplier_id>", methods=["DELETE"])
+@jwt_required()
 def delete_supplier(supplier_id: int):
     try:
         supplier = crud.delete_supplier(supplier_id=supplier_id)

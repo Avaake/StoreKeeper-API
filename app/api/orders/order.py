@@ -8,8 +8,7 @@ from app.api.orders.utils import order_to_dict
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from app.api.orders import crud
-from app.core import settings
-from app.core import logger
+from app.core import settings, logger
 
 
 bp = Blueprint("orders", __name__, url_prefix=settings.api_prefix.orders)
