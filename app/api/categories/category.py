@@ -104,7 +104,7 @@ def update_category(category_id: int):
         )
     except ValidationError as err:
         logger.info(f"Validation Error: {err.errors()}")
-        return jsonify({"error": "validation error", "details": err.errors()}), 422
+        return jsonify({"error": "Validation error", "details": err.errors()}), 422
     except Exception as err:
         logger.error(err)
         return jsonify({"error": "Internal Server Error. Try again later"}), 500

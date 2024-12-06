@@ -65,7 +65,7 @@ def test_create_order_with_invalid_product_id(test_client, init_db, sem_token):
         headers={"Authorization": f"Bearer {sem_token[0]}"},
     )
     assert response.status_code == 404
-    assert response.json["error"] == "Product not found"
+    assert response.json["error"] == "404 Not Found: Product not found"
 
 
 def test_get_all_products(test_client, init_db, sem_token):

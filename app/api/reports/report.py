@@ -27,7 +27,7 @@ def get_sales_report():
 
         return jsonify(sales_report), 200
     except Exception as err:
-        logger.error({"error": str(err)})
+        logger.error(f"Exception: {err}")
         return jsonify({"error": "Internal Server Error. Try again later"}), 500
 
 
@@ -54,5 +54,5 @@ def get_products_that_end():
             200,
         )
     except Exception as err:
-        logger.error({"error": str(err)})
-        return jsonify({"error": "Internal Server Error. Try again"}), 500
+        logger.error(f"Exception: {err}")
+        return jsonify({"error": "Internal Server Error. Try again later"}), 500

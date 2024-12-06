@@ -49,7 +49,7 @@ def test_invalid_update_category(test_client, init_db, sem_token):
     )
 
     assert response_not_found_id.status_code == 404
-    assert response_not_found_id.json["error"] == "Category not found"
+    assert response_not_found_id.json["error"] == "404 Not Found: Category not found"
 
     response_valid_error = test_client.patch(
         "/api/v1/categories/1",
@@ -57,7 +57,7 @@ def test_invalid_update_category(test_client, init_db, sem_token):
         headers={"Authorization": f"Bearer {sem_token[0]}"},
     )
 
-    assert response_valid_error.status_code == 400
+    assert response_valid_error.status_code == 422
     assert response_valid_error.json["error"] == "Validation error"
 
 

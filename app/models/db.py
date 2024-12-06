@@ -72,7 +72,9 @@ class Product(database.get_db().Model):
     updated_at: Mapped[datetime] = mapped_column(
         server_default=func.now(), onupdate=func.now()
     )
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
+    category_id: Mapped[int] = mapped_column(
+        ForeignKey("categories.id", ondelete="SET NULL"), nullable=True
+    )
 
     category: Mapped["Category"] = relationship(back_populates="products")
     order_items: Mapped[list["OrderItem"]] = relationship(back_populates="product")
@@ -114,7 +116,7 @@ class OrderItem(database.get_db().Model):
     __tablename__ = "order_items"
     order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"))
     product_id: Mapped[int] = mapped_column(
-        ForeignKey("products.id", ondelete="SET DEFAULT"), default=0
+        ForeignKey("products.id", ondelete="SET NULL"), nullable=True
     )
     quantity: Mapped[int] = mapped_column()
     price: Mapped[float] = mapped_column(DECIMAL(10, 2))

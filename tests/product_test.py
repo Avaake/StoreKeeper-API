@@ -36,7 +36,9 @@ def test_invalid_create_product(test_client, init_db, sem_token):
     )
 
     assert response_not_found_category.status_code == 404
-    assert response_not_found_category.json["error"] == "Category not found"
+    assert (
+        response_not_found_category.json["error"] == "404 Not Found: Category not found"
+    )
 
     response_valid_error = test_client.post(
         "/api/v1/products",
@@ -69,7 +71,8 @@ def test_get_products(test_client, init_db, sem_token):
 
 def test_get_products_internal_error(test_client, init_db, sem_token):
     with patch(
-        "app.api.products.crud.get_products", side_effect=Exception("Database error")
+        "app.api.products.crud.get_products_by_filter",
+        side_effect=Exception("Database error"),
     ):
         response = test_client.get(
             "/api/v1/products",
@@ -101,7 +104,7 @@ def test_product_not_found(test_client, init_db, sem_token):
         headers={"Authorization": f"Bearer {sem_token[0]}"},
     )
     assert response.status_code == 404
-    assert response.json["error"] == "Product not found"
+    assert response.json["error"] == "404 Not Found: Product not found"
 
 
 def test_update_product(test_client, init_db, sem_token):

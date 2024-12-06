@@ -68,9 +68,9 @@ def init_db(test_client):
     db.session.commit()
 
     order1 = Order(user_id=2, total_price=188000)
-    order_item1 = OrderItem(order_id=1, product_id=1, quantity=2, price=120000)
+    order_item1 = OrderItem(order_id=1, product_id=1, quantity=2, price=60000)
     order_item2 = OrderItem(order_id=1, product_id=3, quantity=1, price=40000)
-    order_item3 = OrderItem(order_id=1, product_id=2, quantity=4, price=28000)
+    order_item3 = OrderItem(order_id=1, product_id=2, quantity=4, price=7000)
     db.session.add(order1)
     db.session.add_all([order_item1, order_item2, order_item3])
     db.session.commit()

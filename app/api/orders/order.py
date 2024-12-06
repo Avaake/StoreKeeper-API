@@ -47,7 +47,7 @@ def get_orders():
     try:
         query_param = FilterOrderSchema(**request.args)
         orders = crud.get_orders_by_filter(
-            status=query_param.status.name,
+            status=query_param.status,
             start_day=query_param.start_day,
             end_day=query_param.end_day,
         )
