@@ -50,13 +50,13 @@ def get_supplies():
         return (
             jsonify(
                 {
-                    "supplys": [
+                    "supplies": [
                         ReadSupplySchema.model_validate(supply).model_dump()
                         for supply in supplies
                     ],
                 }
             ),
-            201,
+            200,
         )
     except Exception as err:
         logger.error(f"Exception: {err}")
@@ -77,7 +77,7 @@ def get_supply(supply_id: int):
                     "supply": ReadSupplySchema.model_validate(supply).model_dump(),
                 }
             ),
-            201,
+            200,
         )
     except Exception as err:
         logger.error(f"Exception: {err}")
@@ -98,7 +98,7 @@ def update_supply(supply_id: int):
                     "supply": ReadSupplySchema.model_validate(supply).model_dump(),
                 }
             ),
-            201,
+            200,
         )
     except ValidationError as err:
         logger.info(f"Validation Error: {err.errors()}")
